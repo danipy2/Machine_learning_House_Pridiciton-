@@ -1,6 +1,3 @@
-# ============================================================
-# HOUSE PRICE PREDICTION FLASK API
-# ============================================================
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -9,26 +6,17 @@ import joblib
 import os
 
 
-# ============================================================
-# 1. CREATE FLASK APPLICATION
-# ============================================================
 
 app = Flask(__name__)
 
-# Allow requests from React frontend
 CORS(app)
 
 
-# ============================================================
-# 2. LOAD THE BEST TRAINED MODEL
-# ============================================================
 
-# Get the directory where this app.py file is located
 BASE_DIR = os.path.dirname(
     os.path.abspath(__file__)
 )
 
-# Build the path to the saved model
 MODEL_PATH = os.path.join(
     BASE_DIR,
     "model",
@@ -36,7 +24,6 @@ MODEL_PATH = os.path.join(
 )
 
 
-# Load the complete trained pipeline
 model = joblib.load(
     MODEL_PATH
 )
@@ -56,9 +43,6 @@ print(
 )
 
 
-# ============================================================
-# 3. HOME ENDPOINT
-# ============================================================
 
 @app.route("/", methods=["GET"])
 def home():
@@ -76,9 +60,6 @@ def home():
     })
 
 
-# ============================================================
-# 4. PREDICTION ENDPOINT
-# ============================================================
 
 @app.route(
     "/predict",
@@ -88,13 +69,9 @@ def predict():
 
     try:
 
-        # ----------------------------------------------------
-        # Get JSON data sent by React
-        # ----------------------------------------------------
 
         data = request.get_json()
 
-        # Check if data was received
         if not data:
 
             return jsonify({
@@ -107,34 +84,18 @@ def predict():
             }), 400
 
 
-        # ----------------------------------------------------
-        # Convert input JSON to Pandas DataFrame
-        # ----------------------------------------------------
 
         input_data = pd.DataFrame([
             data
         ])
 
 
-        # ----------------------------------------------------
-        # Make prediction
-        #
-        # The saved pipeline automatically performs:
-        #
-        # 1. Missing value handling
-        # 2. Encoding
-        # 3. Scaling
-        # 4. Prediction
-        # ----------------------------------------------------
 
         prediction = model.predict(
             input_data
         )[0]
 
 
-        # ----------------------------------------------------
-        # Return prediction to React
-        # ----------------------------------------------------
 
         return jsonify({
 
@@ -151,9 +112,6 @@ def predict():
 
     except Exception as e:
 
-        # ----------------------------------------------------
-        # Return error if prediction fails
-        # ----------------------------------------------------
 
         return jsonify({
 
@@ -165,9 +123,6 @@ def predict():
         }), 400
 
 
-# ============================================================
-# 5. RUN FLASK SERVER
-# ============================================================
 
 if __name__ == "__main__":
 
